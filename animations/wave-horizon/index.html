@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wave Horizon — WebGL Animations</title>
+    <script type="module" crossorigin src="/animation-exploration/assets/wave-horizon-CT7zQtZ8.js"></script>
+    <link rel="modulepreload" crossorigin href="/animation-exploration/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/animation-exploration/assets/three.module-B1NyhNvA.js">
+    <link rel="stylesheet" crossorigin href="/animation-exploration/assets/wave-horizon-CJgLkKlI.css">
+  </head>
+  <body>
+    <a class="back-link" href="../../">← All animations</a>
+    <div id="overlay">
+      <h1>Wave Horizon</h1>
+      <p>Click anywhere to enable ambient sound when waves crest.</p>
+    </div>
+    <div id="sound-control" class="sound-control is-muted">
+      <div class="sound-volume-wrap">
+        <div
+          id="sound-volume"
+          class="sound-volume"
+          role="slider"
+          aria-label="Volume"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="75"
+          tabindex="0"
+        >
+          <div class="sound-volume-track">
+            <div class="sound-volume-fill"></div>
+            <div class="sound-volume-thumb" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+      <button
+        id="sound-toggle"
+        class="sound-toggle"
+        type="button"
+        aria-label="Turn sound on"
+        aria-pressed="false"
+      >
+      <svg class="icon icon-on" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M11 5L6 9H3v6h3l5 4V5zm4.5 2.5a7 7 0 010 9"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M17 8.5a4.5 4.5 0 010 7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+      <svg class="icon icon-off" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M11 5L6 9H3v6h3l5 4V5z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M16 9l5 6M21 9l-5 6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+      </button>
+    </div>
+  </body>
+</html>
