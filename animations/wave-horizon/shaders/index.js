@@ -89,7 +89,7 @@ float waveFromBack(float z, float x, float crashZ) {
 }
 
 float horizonSurge(float x, float z, float crashX, float crashZ, out float impact) {
-  const float SURGE_PERIOD = 16.0;
+  const float SURGE_PERIOD = 28.0;
   const float SURGE_TRAVEL = 11.0;
 
   float cycleT = mod(uTime, SURGE_PERIOD);

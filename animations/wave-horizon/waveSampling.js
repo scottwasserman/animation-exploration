@@ -15,7 +15,7 @@ function organicMask(dist, falloff) {
 }
 
 function horizonSurge(t, x, z, crashX, crashZ) {
-  const SURGE_PERIOD = 16;
+  const SURGE_PERIOD = 28;
   const SURGE_TRAVEL = 11;
 
   const cycleT = t % SURGE_PERIOD;

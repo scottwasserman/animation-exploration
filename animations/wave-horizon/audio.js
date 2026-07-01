@@ -70,20 +70,107 @@ export class WaveAudio {
 
     const now = this.ctx.currentTime;
     const clamped = Math.max(0.15, Math.min(1, intensity));
-    const duration = isSurge ? 2.4 : 1.5 + clamped * 0.8;
 
-    this.playNoiseWash(now, duration, clamped, isSurge);
-    this.playToneSwell(now, duration, clamped, isSurge);
+    if (isSurge) {
+      this.playSurgeSound(now, clamped);
+      return;
+    }
+
+    const duration = 1.5 + clamped * 0.8;
+    this.playNoiseWash(now, duration, clamped);
+    this.playToneSwell(now, duration, clamped);
   }
 
-  playNoiseWash(start, duration, intensity, isSurge) {
+  playSurgeSound(start, intensity) {
+    const duration = 3.2 + intensity * 0.8;
+
+    // Deep rolling roar — low bandpass noise, slow swell
     const bufferSize = Math.floor(this.ctx.sampleRate * duration);
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
 
     for (let i = 0; i < bufferSize; i += 1) {
       const t = i / bufferSize;
-      const env = Math.sin(Math.PI * t) ** (isSurge ? 0.85 : 1.1);
+      const env = Math.sin(Math.PI * t) ** 0.65;
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+
+    const roarSource = this.ctx.createBufferSource();
+    roarSource.buffer = buffer;
+
+    const roarFilter = this.ctx.createBiquadFilter();
+    roarFilter.type = 'bandpass';
+    roarFilter.frequency.value = 180 + intensity * 90;
+    roarFilter.Q.value = 0.35;
+
+    const roarGain = this.ctx.createGain();
+    const roarVol = 0.26 * intensity;
+    roarGain.gain.setValueAtTime(0.0001, start);
+    roarGain.gain.exponentialRampToValueAtTime(roarVol, start + 0.35);
+    roarGain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+    roarSource.connect(roarFilter);
+    roarFilter.connect(roarGain);
+    roarGain.connect(this.master);
+    roarSource.start(start);
+    roarSource.stop(start + duration + 0.05);
+
+    // Sub-bass thump as the wall hits
+    const sub = this.ctx.createOscillator();
+    sub.type = 'triangle';
+    sub.frequency.setValueAtTime(38 + intensity * 12, start);
+    sub.frequency.exponentialRampToValueAtTime(24, start + duration * 0.7);
+
+    const subGain = this.ctx.createGain();
+    subGain.gain.setValueAtTime(0.0001, start);
+    subGain.gain.exponentialRampToValueAtTime(0.14 * intensity, start + 0.08);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, start + duration * 0.85);
+
+    const subFilter = this.ctx.createBiquadFilter();
+    subFilter.type = 'lowpass';
+    subFilter.frequency.value = 120;
+
+    sub.connect(subFilter);
+    subFilter.connect(subGain);
+    subGain.connect(this.master);
+    sub.start(start);
+    sub.stop(start + duration + 0.05);
+
+    // Brief high crack at impact — unlike the soft crest hiss
+    const crackSize = Math.floor(this.ctx.sampleRate * 0.18);
+    const crackBuffer = this.ctx.createBuffer(1, crackSize, this.ctx.sampleRate);
+    const crackData = crackBuffer.getChannelData(0);
+    for (let i = 0; i < crackSize; i += 1) {
+      const t = i / crackSize;
+      crackData[i] = (Math.random() * 2 - 1) * (1 - t) ** 2;
+    }
+
+    const crackSource = this.ctx.createBufferSource();
+    crackSource.buffer = crackBuffer;
+
+    const crackFilter = this.ctx.createBiquadFilter();
+    crackFilter.type = 'highpass';
+    crackFilter.frequency.value = 900;
+
+    const crackGain = this.ctx.createGain();
+    crackGain.gain.setValueAtTime(0.08 * intensity, start);
+    crackGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.18);
+
+    crackSource.connect(crackFilter);
+    crackFilter.connect(crackGain);
+    crackGain.connect(this.master);
+    crackSource.start(start);
+    crackSource.stop(start + 0.25);
+  }
+
+  playNoiseWash(start, duration, intensity) {
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i += 1) {
+      const t = i / bufferSize;
+      const env = Math.sin(Math.PI * t) ** 1.1;
       data[i] = (Math.random() * 2 - 1) * env;
     }
 
@@ -92,11 +179,11 @@ export class WaveAudio {
 
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.value = isSurge ? 420 + intensity * 180 : 620 + intensity * 320;
+    filter.frequency.value = 620 + intensity * 320;
     filter.Q.value = 0.45;
 
     const gain = this.ctx.createGain();
-    const peakVol = (isSurge ? 0.22 : 0.14) * intensity;
+    const peakVol = 0.14 * intensity;
     gain.gain.setValueAtTime(0.0001, start);
     gain.gain.exponentialRampToValueAtTime(peakVol, start + 0.12);
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
@@ -108,14 +195,14 @@ export class WaveAudio {
     source.stop(start + duration + 0.05);
   }
 
-  playToneSwell(start, duration, intensity, isSurge) {
+  playToneSwell(start, duration, intensity) {
     const osc = this.ctx.createOscillator();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(isSurge ? 62 + intensity * 28 : 92 + intensity * 55, start);
-    osc.frequency.exponentialRampToValueAtTime(isSurge ? 48 : 72, start + duration);
+    osc.frequency.setValueAtTime(92 + intensity * 55, start);
+    osc.frequency.exponentialRampToValueAtTime(72, start + duration);
 
     const gain = this.ctx.createGain();
-    const peakVol = (isSurge ? 0.1 : 0.06) * intensity;
+    const peakVol = 0.06 * intensity;
     gain.gain.setValueAtTime(0.0001, start);
     gain.gain.exponentialRampToValueAtTime(peakVol, start + duration * 0.35);
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
