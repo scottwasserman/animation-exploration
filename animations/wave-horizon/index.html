@@ -12,13 +12,31 @@
       <h1>Wave Horizon</h1>
       <p>Click anywhere to enable ambient sound when waves crest.</p>
     </div>
-    <button
-      id="sound-toggle"
-      class="sound-toggle is-muted"
-      type="button"
-      aria-label="Turn sound on"
-      aria-pressed="false"
-    >
+    <div id="sound-control" class="sound-control is-muted">
+      <div class="sound-volume-wrap">
+        <div
+          id="sound-volume"
+          class="sound-volume"
+          role="slider"
+          aria-label="Volume"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="75"
+          tabindex="0"
+        >
+          <div class="sound-volume-track">
+            <div class="sound-volume-fill"></div>
+            <div class="sound-volume-thumb" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+      <button
+        id="sound-toggle"
+        class="sound-toggle"
+        type="button"
+        aria-label="Turn sound on"
+        aria-pressed="false"
+      >
       <svg class="icon icon-on" viewBox="0 0 24 24" aria-hidden="true">
         <path
           d="M11 5L6 9H3v6h3l5 4V5zm4.5 2.5a7 7 0 010 9"
@@ -52,7 +70,8 @@
           stroke-linecap="round"
         />
       </svg>
-    </button>
+      </button>
+    </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

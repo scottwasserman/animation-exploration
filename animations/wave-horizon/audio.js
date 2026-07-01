@@ -6,6 +6,8 @@ export class WaveAudio {
     this.bedNode = null;
     this.enabled = false;
     this.muted = true;
+    this.volume = 0.75;
+    this.maxGain = 0.42;
   }
 
   async init() {
@@ -14,7 +16,7 @@ export class WaveAudio {
     if (!this.ctx) {
       this.ctx = new AudioContext();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.42;
+      this.master.gain.value = 0;
       this.master.connect(this.ctx.destination);
     }
 
@@ -222,16 +224,22 @@ export class WaveAudio {
 
   setMuted(muted) {
     this.muted = muted;
-
-    if (this.master && this.ctx) {
-      const target = muted ? 0 : 0.42;
-      this.master.gain.cancelScheduledValues(this.ctx.currentTime);
-      this.master.gain.setTargetAtTime(target, this.ctx.currentTime, 0.12);
-    }
+    this.applyGain();
   }
 
-  toggleMuted() {
-    this.setMuted(!this.muted);
-    return this.muted;
+  setVolume(volume) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.volume === 0) {
+      this.muted = true;
+    }
+    this.applyGain();
+  }
+
+  applyGain() {
+    if (!this.master || !this.ctx) return;
+
+    const target = this.muted ? 0 : this.volume * this.maxGain;
+    this.master.gain.cancelScheduledValues(this.ctx.currentTime);
+    this.master.gain.setTargetAtTime(target, this.ctx.currentTime, 0.12);
   }
 }

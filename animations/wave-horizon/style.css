@@ -70,11 +70,97 @@ canvas {
   opacity: 0;
 }
 
-.sound-toggle {
+.sound-control {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  opacity: 0.45;
+  transition: opacity 0.25s ease;
+}
+
+.sound-control:hover,
+.sound-control:focus-within {
+  opacity: 0.85;
+}
+
+.sound-volume-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    height 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sound-control:hover .sound-volume-wrap,
+.sound-control:focus-within .sound-volume-wrap {
+  height: 4.5rem;
+  opacity: 1;
+}
+
+.sound-volume {
+  position: relative;
+  width: 0.65rem;
+  height: 4.5rem;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.sound-volume-track {
+  position: absolute;
+  top: calc(0.65rem / 2);
+  bottom: calc(0.65rem / 2);
+  left: 50%;
+  width: 0.65rem;
+  transform: translateX(-50%);
+}
+
+.sound-volume-track::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0.2rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sound-volume-fill {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0.2rem;
+  transform: translateX(-50%);
+  height: 75%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.sound-volume-thumb {
+  position: absolute;
+  left: 50%;
+  bottom: 75%;
+  width: 0.65rem;
+  height: 0.65rem;
+  transform: translate(-50%, 50%);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.sound-toggle {
   display: grid;
   place-items: center;
   width: 2.25rem;
@@ -86,16 +172,14 @@ canvas {
   color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   backdrop-filter: blur(8px);
-  opacity: 0.45;
   transition:
-    opacity 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     background 0.25s ease;
 }
 
-.sound-toggle:hover {
-  opacity: 0.8;
+.sound-control:hover .sound-toggle,
+.sound-control:focus-within .sound-toggle {
   color: rgba(255, 255, 255, 0.85);
   border-color: rgba(255, 255, 255, 0.16);
   background: rgba(5, 5, 8, 0.55);
@@ -104,7 +188,6 @@ canvas {
 .sound-toggle:focus-visible {
   outline: 1px solid rgba(255, 255, 255, 0.25);
   outline-offset: 2px;
-  opacity: 0.85;
 }
 
 .sound-toggle .icon {
@@ -116,10 +199,10 @@ canvas {
   display: none;
 }
 
-.sound-toggle.is-muted .icon-on {
+.sound-control.is-muted .icon-on {
   display: none;
 }
 
-.sound-toggle.is-muted .icon-off {
+.sound-control.is-muted .icon-off {
   display: block;
 }

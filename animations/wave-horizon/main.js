@@ -4,7 +4,12 @@ import { PeakDetector } from './waveSampling.js';
 import { WaveAudio } from './audio.js';
 
 const overlay = document.getElementById('overlay');
+const soundControl = document.getElementById('sound-control');
 const soundToggle = document.getElementById('sound-toggle');
+const soundVolume = document.getElementById('sound-volume');
+const soundVolumeFill = soundVolume.querySelector('.sound-volume-fill');
+const soundVolumeTrack = soundVolume.querySelector('.sound-volume-track');
+const soundVolumeThumb = soundVolume.querySelector('.sound-volume-thumb');
 
 const scene = new THREE.Scene();
 
@@ -73,10 +78,46 @@ let hasInteracted = false;
 const peakDetector = new PeakDetector();
 const waveAudio = new WaveAudio();
 
-function updateSoundToggle(muted) {
-  soundToggle.classList.toggle('is-muted', muted);
+function setVolumeSliderPosition(percent) {
+  const clamped = Math.max(0, Math.min(100, percent));
+  soundVolumeFill.style.height = `${clamped}%`;
+  soundVolumeThumb.style.bottom = `${clamped}%`;
+  soundVolume.setAttribute('aria-valuenow', String(Math.round(clamped)));
+}
+
+function volumeFromPointer(event) {
+  const rect = soundVolumeTrack.getBoundingClientRect();
+  const percent = (1 - (event.clientY - rect.top) / rect.height) * 100;
+  return Math.round(Math.max(0, Math.min(100, percent)));
+}
+
+function updateSoundUI() {
+  const muted = waveAudio.muted || !waveAudio.enabled;
+  const volumePercent = Math.round(waveAudio.volume * 100);
+
+  soundControl.classList.toggle('is-muted', muted);
   soundToggle.setAttribute('aria-pressed', String(!muted));
   soundToggle.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
+  setVolumeSliderPosition(volumePercent);
+}
+
+async function applyVolume(percent) {
+  const volume = Math.max(0, Math.min(100, percent)) / 100;
+
+  if (volume > 0 && !waveAudio.enabled) {
+    const ok = await waveAudio.init();
+    if (!ok) return;
+  }
+
+  waveAudio.setVolume(volume);
+
+  if (volume > 0) {
+    waveAudio.setMuted(false);
+  } else {
+    waveAudio.setMuted(true);
+  }
+
+  updateSoundUI();
 }
 
 async function setSoundEnabled(enabled) {
@@ -85,8 +126,12 @@ async function setSoundEnabled(enabled) {
     if (!ok) return;
   }
 
+  if (enabled && waveAudio.volume === 0) {
+    waveAudio.setVolume(0.75);
+  }
+
   waveAudio.setMuted(!enabled);
-  updateSoundToggle(!enabled);
+  updateSoundUI();
 }
 
 function unlockAudio() {
@@ -98,6 +143,53 @@ function unlockAudio() {
 soundToggle.addEventListener('click', () => {
   setSoundEnabled(waveAudio.muted || !waveAudio.enabled);
 });
+
+let draggingVolume = false;
+
+soundVolume.addEventListener('pointerdown', (event) => {
+  draggingVolume = true;
+  soundVolume.setPointerCapture(event.pointerId);
+  applyVolume(volumeFromPointer(event));
+});
+
+soundVolume.addEventListener('pointermove', (event) => {
+  if (!draggingVolume) return;
+  applyVolume(volumeFromPointer(event));
+});
+
+soundVolume.addEventListener('pointerup', (event) => {
+  draggingVolume = false;
+  soundVolume.releasePointerCapture(event.pointerId);
+});
+
+soundVolume.addEventListener('pointercancel', () => {
+  draggingVolume = false;
+});
+
+soundVolume.addEventListener('keydown', (event) => {
+  const step = event.shiftKey ? 10 : 5;
+  const current = Math.round(waveAudio.volume * 100);
+
+  if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    applyVolume(current + step);
+  } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+    event.preventDefault();
+    applyVolume(current - step);
+  }
+});
+
+soundControl.addEventListener(
+  'wheel',
+  (event) => {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -5 : 5;
+    applyVolume(Math.round(waveAudio.volume * 100) + delta);
+  },
+  { passive: false },
+);
+
+updateSoundUI();
 
 function setMouseFromEvent(event) {
   targetMouse.set(
