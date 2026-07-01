@@ -10,12 +10,16 @@ const soundVolume = document.getElementById('sound-volume');
 const soundVolumeFill = soundVolume.querySelector('.sound-volume-fill');
 const soundVolumeTrack = soundVolume.querySelector('.sound-volume-track');
 const soundVolumeThumb = soundVolume.querySelector('.sound-volume-thumb');
+const lineModeToggle = document.getElementById('line-mode-toggle');
 
 const scene = new THREE.Scene();
 
 const fogColor = new THREE.Color(0x1a2848);
+const lineModeFogColor = new THREE.Color(0x041008);
 scene.fog = new THREE.Fog(fogColor, 18, 65);
-scene.background = createSkyGradient(fogColor);
+const normalBackground = createSkyGradient(fogColor);
+const lineModeBackground = new THREE.Color(0x020806);
+scene.background = normalBackground;
 
 const camera = new THREE.PerspectiveCamera(
   48,
@@ -48,6 +52,7 @@ const uniforms = {
   uFogColor: { value: fogColor },
   uFogNear: { value: 18 },
   uFogFar: { value: 65 },
+  uLineMode: { value: 0 },
 };
 
 const material = new THREE.ShaderMaterial({
@@ -68,7 +73,11 @@ geometry.translate(0, 0, -12);
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-addHorizonLine(scene, fogColor);
+const horizon = addHorizonLine(scene, fogColor);
+const horizonNormalColor = horizon.material.color.clone();
+const horizonLineColor = new THREE.Color(0x3ddf7a);
+
+let lineMode = false;
 
 const targetMouse = new THREE.Vector2(0.5, 0.5);
 const smoothMouse = new THREE.Vector2(0.5, 0.5);
@@ -191,6 +200,25 @@ soundControl.addEventListener(
 
 updateSoundUI();
 
+function setLineMode(enabled) {
+  lineMode = enabled;
+  uniforms.uLineMode.value = enabled ? 1 : 0;
+  scene.background = enabled ? lineModeBackground : normalBackground;
+  scene.fog.color.copy(enabled ? lineModeFogColor : fogColor);
+  uniforms.uFogColor.value.copy(enabled ? lineModeFogColor : fogColor);
+  horizon.material.color.copy(enabled ? horizonLineColor : horizonNormalColor);
+  lineModeToggle.classList.toggle('is-active', enabled);
+  lineModeToggle.setAttribute('aria-pressed', String(enabled));
+  lineModeToggle.setAttribute(
+    'aria-label',
+    enabled ? 'Switch to color view' : 'Switch to green line view',
+  );
+}
+
+lineModeToggle.addEventListener('click', () => {
+  setLineMode(!lineMode);
+});
+
 function setMouseFromEvent(event) {
   targetMouse.set(
     event.clientX / window.innerWidth,
@@ -294,4 +322,5 @@ function addHorizonLine(scene, color) {
 
   const horizon = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), horizonMaterial);
   scene.add(horizon);
+  return horizon;
 }

@@ -237,6 +237,7 @@ uniform float uFogFar;
 uniform float uCrashX;
 uniform float uCrashZ;
 uniform float uTime;
+uniform float uLineMode;
 
 varying vec2 vWorldXZ;
 varying float vLeftWave;
@@ -271,6 +272,24 @@ void main() {
   float xDist = vWorldXZ.x - uCrashX;
   float zDist = vWorldXZ.y - uCrashZ;
   float grain = valueNoise(vWorldXZ * 0.25 + uTime * 0.03);
+
+  if (uLineMode > 0.5) {
+    float field = vElevation * 9.0 + vHorizonSurge * 3.5 + vSurgeImpact * 5.0 + grain * 0.35;
+    float major = abs(fract(field * 0.55) - 0.5) * 2.0;
+    float minor = abs(fract(field * 1.8) - 0.5) * 2.0;
+    float line = 1.0 - smoothstep(0.93, 1.0, major);
+    line = max(line, (1.0 - smoothstep(0.96, 1.0, minor)) * 0.4);
+
+    float peak = smoothstep(0.55, 1.15, vElevation + vSurgeImpact * 0.45);
+    vec3 green = mix(vec3(0.06, 0.42, 0.18), vec3(0.35, 0.98, 0.42), line);
+    vec3 color = green * line;
+    color += vec3(1.0) * peak * (0.55 + line * 0.45);
+
+    float fogFactor = smoothstep(uFogNear, uFogFar, vFogDepth);
+    color = mix(color, uFogColor * 0.2, fogFactor * 0.9);
+    gl_FragColor = vec4(color, 1.0);
+    return;
+  }
 
   float leftMask = smoothstep(14.0 + grain * 4.0, -2.0, -xDist);
   float rightMask = smoothstep(-14.0 - grain * 4.0, 2.0, xDist);

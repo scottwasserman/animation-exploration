@@ -1,15 +1,22 @@
 export const animations = [
   {
     id: 'flow-field',
-    title: 'Flow Field',
-    description: 'Mouse-reactive aurora noise field. Move to warp, click to pulse.',
+    title: 'Neural Activity',
+    description: 'Mouse-reactive neural noise field. Move to warp, click to pulse.',
     path: `${import.meta.env.BASE_URL}animations/flow-field/`,
     tags: ['shader', 'interactive'],
   },
   {
+    id: 'face-it-1',
+    title: 'Face It 1',
+    description: 'Outside me. Drag to rotate, shift+drag to move, scroll to zoom.',
+    path: `${import.meta.env.BASE_URL}animations/face-it-1/`,
+    tags: ['shader', 'interactive'],
+  },
+  {
     id: 'wave-horizon',
-    title: 'Wave Horizon',
-    description: '3D opposing waves crash together — warm from the left, cool from the right, blending where they meet.',
+    title: 'Consciousness 1',
+    description: 'A look at my typical brain activity. White peaks are breaking through to the foreground of thought.',
     path: `${import.meta.env.BASE_URL}animations/wave-horizon/`,
     tags: ['3d', 'shader', 'interactive'],
   },
