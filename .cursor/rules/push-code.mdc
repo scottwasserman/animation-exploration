@@ -5,11 +5,15 @@ alwaysApply: true
 
 # Push Code
 
-When the user says **"push code"** (or clearly means the same thing), push to GitHub. GitHub Actions publishes the site to Pages automatically.
+When the user says **"push code"** (or clearly means the same thing), commit any uncommitted work if needed, then **run**:
+
+```bash
+git push origin main
+```
+
+Do not skip the push step. Do not only tell the user to push — execute the command yourself.
 
 ## Workflow
-
-Run these steps in order:
 
 1. **Inspect git state** (in parallel):
    - `git status`
@@ -21,9 +25,9 @@ Run these steps in order:
    - Write a concise commit message focused on *why*
    - Commit with a HEREDOC message
 
-3. **Push to GitHub**:
+3. **Push** — always run:
    - `git push origin main`
-   - Request `git_write` and `full_network` permissions if blocked
+   - Request `git_write` and `full_network` (or `all`) permissions if blocked
 
 4. **Report back** with:
    - Whether a new commit was created
@@ -35,5 +39,5 @@ Run these steps in order:
 
 - Do not amend commits unless the user explicitly asks.
 - Do not force-push to `main`.
-- If push fails on auth, tell the user to run `git push origin main` locally.
-- Local dev is unchanged; deployment is triggered by the push, not a separate build step.
+- If push fails on auth, say so and ask the user to run `git push origin main` locally.
+- GitHub Actions deploys to Pages after a successful push.
