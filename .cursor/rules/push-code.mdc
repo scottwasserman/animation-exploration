@@ -1,0 +1,39 @@
+---
+description: Push to GitHub when the user says "push code"
+alwaysApply: true
+---
+
+# Push Code
+
+When the user says **"push code"** (or clearly means the same thing), push to GitHub. GitHub Actions publishes the site to Pages automatically.
+
+## Workflow
+
+Run these steps in order:
+
+1. **Inspect git state** (in parallel):
+   - `git status`
+   - `git diff` and `git diff --staged`
+   - `git log -3 --oneline`
+
+2. **Commit if needed** — if there are uncommitted changes:
+   - Stage all relevant files (never stage secrets like `.env`)
+   - Write a concise commit message focused on *why*
+   - Commit with a HEREDOC message
+
+3. **Push to GitHub**:
+   - `git push origin main`
+   - Request `git_write` and `full_network` permissions if blocked
+
+4. **Report back** with:
+   - Whether a new commit was created
+   - Push result
+   - Live site URL: **https://scottwasserman.github.io/animation-exploration/**
+   - Link to Actions: **https://github.com/scottwasserman/animation-exploration/actions**
+
+## Notes
+
+- Do not amend commits unless the user explicitly asks.
+- Do not force-push to `main`.
+- If push fails on auth, tell the user to run `git push origin main` locally.
+- Local dev is unchanged; deployment is triggered by the push, not a separate build step.

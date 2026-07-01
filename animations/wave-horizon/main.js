@@ -4,6 +4,7 @@ import { PeakDetector } from './waveSampling.js';
 import { WaveAudio } from './audio.js';
 
 const overlay = document.getElementById('overlay');
+const soundToggle = document.getElementById('sound-toggle');
 
 const scene = new THREE.Scene();
 
@@ -72,6 +73,32 @@ let hasInteracted = false;
 const peakDetector = new PeakDetector();
 const waveAudio = new WaveAudio();
 
+function updateSoundToggle(muted) {
+  soundToggle.classList.toggle('is-muted', muted);
+  soundToggle.setAttribute('aria-pressed', String(!muted));
+  soundToggle.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
+}
+
+async function setSoundEnabled(enabled) {
+  if (enabled && !waveAudio.enabled) {
+    const ok = await waveAudio.init();
+    if (!ok) return;
+  }
+
+  waveAudio.setMuted(!enabled);
+  updateSoundToggle(!enabled);
+}
+
+function unlockAudio() {
+  if (!waveAudio.enabled) {
+    setSoundEnabled(true);
+  }
+}
+
+soundToggle.addEventListener('click', () => {
+  setSoundEnabled(waveAudio.muted || !waveAudio.enabled);
+});
+
 function setMouseFromEvent(event) {
   targetMouse.set(
     event.clientX / window.innerWidth,
@@ -82,11 +109,6 @@ function setMouseFromEvent(event) {
     hasInteracted = true;
     overlay.classList.add('hidden');
   }
-}
-
-function unlockAudio() {
-  if (waveAudio.enabled) return;
-  waveAudio.init();
 }
 
 window.addEventListener('pointermove', setMouseFromEvent);

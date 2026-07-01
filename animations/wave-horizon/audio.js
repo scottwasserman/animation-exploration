@@ -5,6 +5,7 @@ export class WaveAudio {
     this.bedGain = null;
     this.bedNode = null;
     this.enabled = false;
+    this.muted = true;
   }
 
   async init() {
@@ -66,7 +67,7 @@ export class WaveAudio {
   }
 
   playPeak(intensity = 0.5, isSurge = false) {
-    if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
+    if (!this.enabled || this.muted || !this.ctx || this.ctx.state !== 'running') return;
 
     const now = this.ctx.currentTime;
     const clamped = Math.max(0.15, Math.min(1, intensity));
@@ -217,5 +218,20 @@ export class WaveAudio {
 
     osc.start(start);
     osc.stop(start + duration + 0.05);
+  }
+
+  setMuted(muted) {
+    this.muted = muted;
+
+    if (this.master && this.ctx) {
+      const target = muted ? 0 : 0.42;
+      this.master.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.master.gain.setTargetAtTime(target, this.ctx.currentTime, 0.12);
+    }
+  }
+
+  toggleMuted() {
+    this.setMuted(!this.muted);
+    return this.muted;
   }
 }
