@@ -1,11 +1,11 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import{S as d,O as x,W as f,a as w,V as i,M as p,P as h,C as y}from"./three.module-B1NyhNvA.js";const g=`
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{c as d,O as x,W as f,g as i,h as w,a as p,P as h,f as y}from"./three.module-Ccu3JAG0.js";const g=`
 varying vec2 vUv;
 
 void main() {
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
-`,M=`
+`,z=`
 uniform float uTime;
 uniform vec2 uMouse;
 uniform vec2 uResolution;
@@ -99,4 +99,4 @@ void main() {
 
   gl_FragColor = vec4(color, 1.0);
 }
-`,z=document.getElementById("overlay"),r=new d,b=new x(-1,1,1,-1,0,1),t=new f({antialias:!0,alpha:!1,powerPreference:"high-performance"});t.setPixelRatio(Math.min(window.devicePixelRatio,2));t.setSize(window.innerWidth,window.innerHeight);document.body.appendChild(t.domElement);const o={uTime:{value:0},uMouse:{value:new i(.5,.5)},uResolution:{value:new i(window.innerWidth,window.innerHeight)},uPulse:{value:0}},C=new w({vertexShader:g,fragmentShader:M,uniforms:o}),P=new p(new h(2,2),C);r.add(P);const l=new i(.5,.5),a=new i(.5,.5);let c=0,s=!1;function v(e){const n=e.clientX/window.innerWidth,m=1-e.clientY/window.innerHeight;l.set(n,m),s||(s=!0,z.classList.add("hidden"))}window.addEventListener("pointermove",v);window.addEventListener("pointerdown",e=>{c=1,v(e)});window.addEventListener("resize",()=>{const{innerWidth:e,innerHeight:n}=window;t.setSize(e,n),o.uResolution.value.set(e,n)});const T=new y;function u(){const e=T.getElapsedTime();o.uTime.value=e,a.lerp(l,.08),o.uMouse.value.copy(a),c*=.92,o.uPulse.value=c,t.render(r,b),requestAnimationFrame(u)}u();
+`,M=document.getElementById("overlay"),r=new d,b=new x(-1,1,1,-1,0,1),t=new f({antialias:!0,alpha:!1,powerPreference:"high-performance"});t.setPixelRatio(Math.min(window.devicePixelRatio,2));t.setSize(window.innerWidth,window.innerHeight);document.body.appendChild(t.domElement);const o={uTime:{value:0},uMouse:{value:new i(.5,.5)},uResolution:{value:new i(window.innerWidth,window.innerHeight)},uPulse:{value:0}},P=new w({vertexShader:g,fragmentShader:z,uniforms:o}),C=new p(new h(2,2),P);r.add(C);const l=new i(.5,.5),a=new i(.5,.5);let c=0,s=!1;function v(e){const n=e.clientX/window.innerWidth,m=1-e.clientY/window.innerHeight;l.set(n,m),s||(s=!0,M.classList.add("hidden"))}window.addEventListener("pointermove",v);window.addEventListener("pointerdown",e=>{c=1,v(e)});window.addEventListener("resize",()=>{const{innerWidth:e,innerHeight:n}=window;t.setSize(e,n),o.uResolution.value.set(e,n)});const T=new y;function u(){const e=T.getElapsedTime();o.uTime.value=e,a.lerp(l,.08),o.uMouse.value.copy(a),c*=.92,o.uPulse.value=c,t.render(r,b),requestAnimationFrame(u)}u();
