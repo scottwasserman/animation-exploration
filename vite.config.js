@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => ({
         'flow-field': resolve(__dirname, 'animations/flow-field/index.html'),
         'face-it-1': resolve(__dirname, 'animations/face-it-1/index.html'),
         'wave-horizon': resolve(__dirname, 'animations/wave-horizon/index.html'),
+        'leave-a-message': resolve(__dirname, 'animations/leave-a-message/index.html'),
       },
     },
   },

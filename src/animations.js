@@ -20,4 +20,11 @@ export const animations = [
     path: `${import.meta.env.BASE_URL}animations/wave-horizon/`,
     tags: ['3d', 'shader', 'interactive'],
   },
+  {
+    id: 'leave-a-message',
+    title: 'Leave A Message',
+    description: '',
+    path: `${import.meta.env.BASE_URL}animations/leave-a-message/`,
+    tags: ['3d', 'audio', 'interactive'],
+  },
 ];
