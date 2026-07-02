@@ -10,6 +10,9 @@ export class VoicemailAudio {
     this.audioBuffer = null;
     this.playing = false;
     this.ready = false;
+    this.muted = false;
+    this.volume = 0.85;
+    this.maxGain = 0.85;
   }
 
   async load(url) {
@@ -49,7 +52,6 @@ export class VoicemailAudio {
     this.source.loop = true;
 
     this.gain = this.ctx.createGain();
-    this.gain.gain.value = 0.85;
 
     const voiceHighpass = this.ctx.createBiquadFilter();
     voiceHighpass.type = 'highpass';
@@ -103,7 +105,29 @@ export class VoicemailAudio {
 
     this.source.start();
     this.playing = true;
+    this.applyGain();
     return true;
+  }
+
+  setMuted(muted) {
+    this.muted = muted;
+    this.applyGain();
+  }
+
+  setVolume(volume) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.volume === 0) {
+      this.muted = true;
+    }
+    this.applyGain();
+  }
+
+  applyGain() {
+    if (!this.gain || !this.ctx) return;
+
+    const target = this.muted ? 0 : this.volume * this.maxGain;
+    this.gain.gain.cancelScheduledValues(this.ctx.currentTime);
+    this.gain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.12);
   }
 
   getVoiceLevels(lineCount) {
@@ -157,7 +181,7 @@ export class VoicemailAudio {
     const levels = new Float32Array(pointCount);
 
     for (let i = 0; i < pointCount; i += 1) {
-      const bassStart = Math.floor(i * bassPerPoint);
+      const bassStart = Math.max(1, Math.floor(i * bassPerPoint));
       const bassEnd = Math.min(bassMaxBin, Math.floor((i + 1) * bassPerPoint));
       let bassSum = 0;
 

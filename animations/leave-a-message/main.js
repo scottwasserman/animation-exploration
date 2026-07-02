@@ -3,6 +3,12 @@ import audioUrl from './assets/leave-a-message.mp3';
 import { VoicemailAudio } from './audio.js';
 
 const overlay = document.getElementById('overlay');
+const soundControl = document.getElementById('sound-control');
+const soundToggle = document.getElementById('sound-toggle');
+const soundVolume = document.getElementById('sound-volume');
+const soundVolumeFill = soundVolume.querySelector('.sound-volume-fill');
+const soundVolumeTrack = soundVolume.querySelector('.sound-volume-track');
+const soundVolumeThumb = soundVolume.querySelector('.sound-volume-thumb');
 const LINE_COUNT = 32;
 const LINE_SPACING = 0.22;
 const MAX_HEIGHT = 3.2;
@@ -43,7 +49,7 @@ const lineGroup = new THREE.Group();
 scene.add(lineGroup);
 
 const waveGroup = new THREE.Group();
-lineGroup.add(waveGroup);
+scene.add(waveGroup);
 
 const wavePositions = new Float32Array(WAVE_POINTS * 3);
 const waveGeometry = new THREE.BufferGeometry();
@@ -220,6 +226,118 @@ const voicemailAudio = new VoicemailAudio();
 let started = false;
 let loading = false;
 
+function setVolumeSliderPosition(percent) {
+  const clamped = Math.max(0, Math.min(100, percent));
+  soundVolumeFill.style.height = `${clamped}%`;
+  soundVolumeThumb.style.bottom = `${clamped}%`;
+  soundVolume.setAttribute('aria-valuenow', String(Math.round(clamped)));
+}
+
+function volumeFromPointer(event) {
+  const rect = soundVolumeTrack.getBoundingClientRect();
+  const percent = (1 - (event.clientY - rect.top) / rect.height) * 100;
+  return Math.round(Math.max(0, Math.min(100, percent)));
+}
+
+function updateSoundUI() {
+  const muted = voicemailAudio.muted || !started;
+  const volumePercent = Math.round(voicemailAudio.volume * 100);
+
+  soundControl.classList.toggle('is-muted', muted);
+  soundToggle.setAttribute('aria-pressed', String(!muted));
+  soundToggle.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
+  setVolumeSliderPosition(volumePercent);
+}
+
+async function applyVolume(percent) {
+  const volume = Math.max(0, Math.min(100, percent)) / 100;
+
+  if (volume > 0 && !started) {
+    await startExperience();
+    if (!started) return;
+  }
+
+  voicemailAudio.setVolume(volume);
+
+  if (volume > 0) {
+    voicemailAudio.setMuted(false);
+  } else {
+    voicemailAudio.setMuted(true);
+  }
+
+  updateSoundUI();
+}
+
+async function setSoundEnabled(enabled) {
+  if (enabled && !started) {
+    await startExperience();
+    if (!started) return;
+  }
+
+  if (enabled && voicemailAudio.volume === 0) {
+    voicemailAudio.setVolume(0.85);
+  }
+
+  voicemailAudio.setMuted(!enabled);
+  updateSoundUI();
+}
+
+soundToggle.addEventListener('click', (event) => {
+  event.stopPropagation();
+  setSoundEnabled(voicemailAudio.muted || !started);
+});
+
+let draggingVolume = false;
+
+soundVolume.addEventListener('pointerdown', (event) => {
+  event.stopPropagation();
+  draggingVolume = true;
+  soundVolume.setPointerCapture(event.pointerId);
+  applyVolume(volumeFromPointer(event));
+});
+
+soundVolume.addEventListener('pointermove', (event) => {
+  if (!draggingVolume) return;
+  applyVolume(volumeFromPointer(event));
+});
+
+soundVolume.addEventListener('pointerup', (event) => {
+  draggingVolume = false;
+  soundVolume.releasePointerCapture(event.pointerId);
+});
+
+soundVolume.addEventListener('pointercancel', () => {
+  draggingVolume = false;
+});
+
+soundVolume.addEventListener('keydown', (event) => {
+  const step = event.shiftKey ? 10 : 5;
+  const current = Math.round(voicemailAudio.volume * 100);
+
+  if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    applyVolume(current + step);
+  } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+    event.preventDefault();
+    applyVolume(current - step);
+  }
+});
+
+soundControl.addEventListener(
+  'wheel',
+  (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const delta = event.deltaY > 0 ? -5 : 5;
+    applyVolume(Math.round(voicemailAudio.volume * 100) + delta);
+  },
+  { passive: false },
+);
+
+soundControl.addEventListener('pointerdown', (event) => {
+  event.stopPropagation();
+});
+
 function updateMusicWave(levels, time, voiceGrowth) {
   let totalLevel = 0;
 
@@ -234,17 +352,29 @@ function updateMusicWave(levels, time, voiceGrowth) {
     WAVE_AMPLITUDE_MIN_SCALE +
     voiceGrowth * (WAVE_AMPLITUDE_MAX_SCALE - WAVE_AMPLITUDE_MIN_SCALE);
   const amplitude = WAVE_AMPLITUDE * amplitudeScale;
+  const edgeMargin = 0.08;
 
   for (let i = 0; i < WAVE_POINTS; i += 1) {
     const t = i / (WAVE_POINTS - 1);
+    const edgeTaper = Math.min(1, t / edgeMargin, (1 - t) / edgeMargin);
     const x = (t - 0.5) * WAVE_WIDTH;
-    const ripple = Math.sin(time * 1.15 + t * Math.PI * 3.4) * 0.06 * amplitudeScale;
-    const y = (smoothWaveLevels[i] - meanLevel) * amplitude + ripple;
+    const ripple = Math.sin(time * 1.15 + t * Math.PI * 3.4) * 0.06 * amplitudeScale * edgeTaper;
+    const y = (smoothWaveLevels[i] - meanLevel) * amplitude * edgeTaper;
     const z = WAVE_DEPTH + Math.sin(t * Math.PI * 2 + time * 0.45) * 0.1;
 
     wavePositions[i * 3] = x;
-    wavePositions[i * 3 + 1] = y;
+    wavePositions[i * 3 + 1] = y + ripple;
     wavePositions[i * 3 + 2] = z;
+  }
+
+  let waveMeanY = 0;
+  for (let i = 0; i < WAVE_POINTS; i += 1) {
+    waveMeanY += wavePositions[i * 3 + 1];
+  }
+  waveMeanY /= WAVE_POINTS;
+
+  for (let i = 0; i < WAVE_POINTS; i += 1) {
+    wavePositions[i * 3 + 1] -= waveMeanY;
   }
 
   waveGeometry.attributes.position.needsUpdate = true;
@@ -271,6 +401,7 @@ async function startExperience() {
 
     started = true;
     overlay.classList.add('hidden');
+    updateSoundUI();
   } catch {
     overlay.querySelector('p').textContent = 'Could not load audio. Tap to retry.';
   } finally {
@@ -278,8 +409,12 @@ async function startExperience() {
   }
 }
 
-window.addEventListener('pointerdown', startExperience);
+window.addEventListener('pointerdown', (event) => {
+  if (event.target.closest('#sound-control, .back-link')) return;
+  startExperience();
+});
 window.addEventListener('keydown', (event) => {
+  if (event.target.closest('#sound-control')) return;
   if (event.key === ' ' || event.key === 'Enter') {
     event.preventDefault();
     startExperience();
@@ -294,6 +429,7 @@ window.addEventListener('resize', () => {
 });
 
 setStreamColors(0);
+updateSoundUI();
 
 const clock = new THREE.Clock();
 
