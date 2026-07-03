@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 const overlay = document.getElementById('overlay');
 const resetButton = document.getElementById('reset-grid');
-const statusEl = document.getElementById('status');
 
 const GRID_SIZE = 10;
 const NEURON_COUNT = GRID_SIZE * GRID_SIZE * GRID_SIZE;
@@ -280,23 +279,12 @@ function updateConnectionStates(delta) {
   }
 }
 
-function updateStatus() {
-  if (!statusEl) return;
-  statusEl.textContent = `Links: ${links.length}`;
-}
-
-function reportError(error) {
-  if (!statusEl) return;
-  statusEl.textContent = `Error: ${error.message}`;
-}
-
 function resetGrid() {
   while (links.length > 0) {
     removeConnection(links[links.length - 1]);
   }
 
   connectionMap.clear();
-  updateStatus();
 
   targetRotation.set(0, 0, 0);
   currentRotation.set(0, 0, 0);
@@ -418,8 +406,6 @@ function animate() {
       tryStartDisconnect();
     }
 
-    updateStatus();
-
     const autoTilt = Math.sin(elapsed * 0.11) * 0.18;
     if (!isDragging) {
       autoYawOffset += delta * autoRotateSpeed;
@@ -440,10 +426,8 @@ function animate() {
 
     renderer.render(scene, camera);
   } catch (error) {
-    reportError(error);
     console.error(error);
   }
 }
 
-updateStatus();
 animate();
