@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => ({
         'face-it-1': resolve(__dirname, 'animations/face-it-1/index.html'),
         'wave-horizon': resolve(__dirname, 'animations/wave-horizon/index.html'),
         'leave-a-message': resolve(__dirname, 'animations/leave-a-message/index.html'),
+        connections: resolve(__dirname, 'animations/connections/index.html'),
       },
     },
   },

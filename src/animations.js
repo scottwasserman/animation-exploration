@@ -27,4 +27,11 @@ export const animations = [
     path: `${import.meta.env.BASE_URL}animations/leave-a-message/`,
     tags: ['3d', 'audio', 'interactive'],
   },
+  {
+    id: 'connections',
+    title: 'Connections',
+    description: 'A 3D grid of 1000 neurons, randomly linking and unlinking as the lattice spins.',
+    path: `${import.meta.env.BASE_URL}animations/connections/`,
+    tags: ['3d', 'interactive'],
+  },
 ];
