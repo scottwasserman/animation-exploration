@@ -21,6 +21,13 @@ export const animations = [
     tags: ['3d', 'shader', 'interactive'],
   },
   {
+    id: 'wave-horizon-2',
+    title: 'Consciousness 2',
+    description: 'A look at my typical brain activity. White peaks are breaking through to the foreground of thought.',
+    path: `${import.meta.env.BASE_URL}animations/wave-horizon-2/`,
+    tags: ['3d', 'shader', 'interactive'],
+  },
+  {
     id: 'leave-a-message',
     title: 'Leave A Message',
     description: '',
@@ -28,10 +35,24 @@ export const animations = [
     tags: ['3d', 'audio', 'interactive'],
   },
   {
-    id: 'connections',
-    title: 'Connections',
+    id: 'connections-1',
+    title: 'Connections 1',
     description: 'A 3D grid of 1000 neurons, randomly linking and unlinking as the lattice spins.',
-    path: `${import.meta.env.BASE_URL}animations/connections/`,
+    path: `${import.meta.env.BASE_URL}animations/connections-1/`,
+    tags: ['3d', 'interactive'],
+  },
+  {
+    id: 'connections-2',
+    title: 'Connections 2',
+    description: 'A 3D grid of 1000 neurons, randomly linking and unlinking as the lattice spins.',
+    path: `${import.meta.env.BASE_URL}animations/connections-2/`,
+    tags: ['3d', 'interactive'],
+  },
+  {
+    id: 'model-loader',
+    title: 'Model Loader',
+    description: 'Load and inspect GLB, glTF, or OBJ models. Drag to rotate, shift+drag to move, scroll to zoom.',
+    path: `${import.meta.env.BASE_URL}animations/model-loader/`,
     tags: ['3d', 'interactive'],
   },
 ];
