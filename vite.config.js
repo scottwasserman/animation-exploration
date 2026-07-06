@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
         'connections-1': resolve(__dirname, 'animations/connections-1/index.html'),
         'connections-2': resolve(__dirname, 'animations/connections-2/index.html'),
         'model-loader': resolve(__dirname, 'animations/model-loader/index.html'),
+        heartsigh: resolve(__dirname, 'animations/heartsigh/index.html'),
       },
     },
   },

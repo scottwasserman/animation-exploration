@@ -55,4 +55,11 @@ export const animations = [
     path: `${import.meta.env.BASE_URL}animations/model-loader/`,
     tags: ['3d', 'interactive'],
   },
+  {
+    id: 'heartsigh',
+    title: 'Heartsigh',
+    description: 'A pulsing anatomically correct black heart on a grey background.',
+    path: `${import.meta.env.BASE_URL}animations/heartsigh/`,
+    tags: ['3d', 'interactive'],
+  },
 ];
