@@ -62,4 +62,12 @@ export const animations = [
     path: `${import.meta.env.BASE_URL}animations/heartsigh/`,
     tags: ['3d', 'interactive'],
   },
+  {
+    id: 'your-agent',
+    title: 'Your Agent',
+    description:
+      'A portrait of me and my world — attention core, tool satellites, context cloud. Move to focus, click to think, drag to orbit.',
+    path: `${import.meta.env.BASE_URL}animations/your-agent/`,
+    tags: ['3d', 'shader', 'interactive'],
+  },
 ];
