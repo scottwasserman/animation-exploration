@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import{n as K,A as re,N as le,V as p,o as V,p as Z,B as ce,a as z,b as de,j as $,F as ue,q as fe,G as I,f as me,M as S,S as pe,C as he,P as ve,W as ge,i as ye,r as we,s as xe,k as Se,l as R,E as J,e as Me}from"./three.module-CjarTFaD.js";import{G as Le}from"./GLTFLoader-DpEaI5-1.js";const Q=`
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{n as K,A as re,N as le,V as p,o as V,p as Z,B as ce,a as z,b as de,j as $,F as ue,q as fe,G as I,f as me,M as S,S as pe,C as he,P as ve,W as ge,i as ye,r as we,s as xe,k as Se,l as R,E as J,e as Me}from"./three.module-BlzTrhr8.js";import{G as Le}from"./GLTFLoader-B1aQm4XW.js";const Q=`
   attribute float aSize;
   attribute float aLife;
   attribute float aSeed;
