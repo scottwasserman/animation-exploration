@@ -410,7 +410,7 @@ async function startExperience() {
 }
 
 window.addEventListener('pointerdown', (event) => {
-  if (event.target.closest('#sound-control, .back-link')) return;
+  if (event.target.closest('#sound-control')) return;
   startExperience();
 });
 window.addEventListener('keydown', (event) => {
