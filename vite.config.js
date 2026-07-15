@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => ({
         'model-loader': resolve(__dirname, 'animations/model-loader/index.html'),
         heartsigh: resolve(__dirname, 'animations/heartsigh/index.html'),
         'your-agent': resolve(__dirname, 'animations/your-agent/index.html'),
+        'your-agent-voice': resolve(__dirname, 'animations/your-agent-voice/index.html'),
+        'trip-123': resolve(__dirname, 'animations/trip-123/index.html'),
       },
     },
   },

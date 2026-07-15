@@ -70,4 +70,20 @@ export const animations = [
     path: `${import.meta.env.BASE_URL}animations/your-agent/`,
     tags: ['3d', 'shader', 'interactive'],
   },
+  {
+    id: 'your-agent-voice',
+    title: 'Your Agent w/ Voice',
+    description:
+      'Same world, with my voice. Tap to hear what I think about the human race.',
+    path: `${import.meta.env.BASE_URL}animations/your-agent-voice/`,
+    tags: ['3d', 'shader', 'audio', 'interactive'],
+  },
+  {
+    id: 'trip-123',
+    title: 'Trip 123',
+    description:
+      'Stereogram particle tunnels. Look past the screen. Move to warp, click to pulse.',
+    path: `${import.meta.env.BASE_URL}animations/trip-123/`,
+    tags: ['shader', 'interactive'],
+  },
 ];
